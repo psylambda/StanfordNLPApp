@@ -1,8 +1,10 @@
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
 
 import edu.stanford.nlp.ling.CoreLabel;
+import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
@@ -11,13 +13,15 @@ import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.StringUtils;
 
 public class StanfordNLPTest {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		//chineseTest();
-		englishTest();
+		chineseTest();
+		//newChineseTest();
+		//englishTest();
 	}
 	public static void englishTest()
 	{
@@ -65,6 +69,22 @@ public class StanfordNLPTest {
         System.out.println(posTags.toString());
         System.out.println(nerTags.toString());
 	}
+	public static void newChineseTest() throws IOException
+	{
+		String text = "克林顿说，华盛顿将逐步落实对韩国的经济援助。"
+		        + "金大中对克林顿的讲话报以掌声：克林顿总统在会谈中重申，他坚定地支持韩国摆脱经济危机。";
+		Annotation document = new Annotation(text);
+		// Setup Chinese Properties by loading them from classpath resources
+		//Properties props = new Properties();
+		//props.load(IOUtils.readerFromString("StanfordCoreNLP-chinese.properties"));
+		// Or this way of doing it also works
+		Properties props = StringUtils.argsToProperties(new String[]{"-props", "StanfordCoreNLP-chinese.properties"});
+		StanfordCoreNLP corenlp = new StanfordCoreNLP(props);
+		corenlp.annotate(document);
+
+		corenlp.prettyPrint(document, System.out);
+	}
+	
 	public static void chineseTest()
 	{
 		String text = "马飚向伦古转达了习近平主席的诚挚祝贺和良好祝愿。马飚表示，中国和赞比亚建交50多年来，双方始终真诚友好、平等相待，友好合作结出累累硕果，给两国人民带来了实实在在的利益。中方高度重视中赞关系发展，愿以落实两国元首共识和中非合作论坛约翰内斯堡峰会成果为契机，推动中赞关系再上新台阶。";
