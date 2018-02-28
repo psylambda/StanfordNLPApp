@@ -46,5 +46,12 @@
             <artifactId>slf4j-simple</artifactId>
             <version>1.6.1</version>
         </dependency>
+        <dependency>
+  <groupId>edu.stanford.nlp</groupId>
+  <artifactId>stanford-parser</artifactId>
+  <version>3.8.0</version>
+  <classifier>javadoc</classifier>
+</dependency>
   </dependencies>
+  
 </project>
