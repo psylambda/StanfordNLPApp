@@ -1,4 +1,4 @@
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -19,7 +19,9 @@ public class StanfordNLPTest {
 
 	public static void main(String[] args) throws IOException {
 		// TODO Auto-generated method stub
-		chineseTest();
+		//FileTest();
+		MyTest();
+		//chineseTest();
 		//newChineseTest();
 		//englishTest();
 	}
@@ -87,11 +89,65 @@ public class StanfordNLPTest {
 	
 	public static void chineseTest()
 	{
-		String text = "马飚向伦古转达了习近平主席的诚挚祝贺和良好祝愿。马飚表示，中国和赞比亚建交50多年来，双方始终真诚友好、平等相待，友好合作结出累累硕果，给两国人民带来了实实在在的利益。中方高度重视中赞关系发展，愿以落实两国元首共识和中非合作论坛约翰内斯堡峰会成果为契机，推动中赞关系再上新台阶。";
+		String text = "She went to America last week.";
 		Annotation document = new Annotation(text);
-		StanfordCoreNLP corenlp = new StanfordCoreNLP("StanfordCoreNLP-chinese.properties");
+		StanfordCoreNLP corenlp = new StanfordCoreNLP("MyStanfordNLPChinese.properties");
 		corenlp.annotate(document);
 
 		corenlp.prettyPrint(document, System.out);
+	}
+	
+	public static void MyTest()
+	{
+		String text = "我感冒了，想喝口服液，感冒是一种疾病，常伴有头痛和发烧。";
+		Annotation document = new Annotation(text);
+		StanfordCoreNLP corenlp = new StanfordCoreNLP("test.properties");
+		corenlp.annotate(document);
+
+		corenlp.prettyPrint(document, System.out);
+	}
+	
+	
+	public static void FileTest() throws IOException
+	{
+		try { // 防止文件建立或读取失败，用catch捕捉错误并打印，也可以throw  
+            /* 读入TXT文件 */  
+            String pathname = "D:\\NLP\\TrainNERChinese\\无关小说.txt"; // 绝对路径或相对路径都可以，这里是绝对路径，写入文件时演示相对路径  
+            BufferedReader  reader = new BufferedReader(new FileReader(pathname));
+            String line = "";  
+            StringBuilder sb = new StringBuilder();//定义一个字符串缓存，将字符串存放缓存中
+            line = reader.readLine();  
+            while (line != null) {  
+                System.out.println(line);
+                sb.append(line + "\n");//将读取的字符串添加换行符后累加存放在缓存中
+                line = reader.readLine(); // 一次读入一行数据  
+            }  
+            String str = sb.toString();
+            System.out.println(str);
+        	Annotation document = new Annotation(str);
+    		StanfordCoreNLP corenlp = new StanfordCoreNLP("ChineseTest.properties");
+    		corenlp.annotate(document);
+    		
+    		FileOutputStream out = null;
+    		out = new FileOutputStream(new File("D:\\NLP\\TrainNERChinese\\无关小说分词.txt"));
+    		// these are all the sentences in this document
+            // a CoreMap is essentially a Map that uses class objects as keys and
+            // has values with custom types
+            List<CoreMap> sentences = document.get(SentencesAnnotation.class);
+            for (CoreMap sentence : sentences) {
+                // traversing the words in the current sentence
+                // a CoreLabel is a CoreMap with additional token-specific methods
+                for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+                    // this is the text of the token
+                    String word = token.get(TextAnnotation.class);
+                    out.write((word+"\tO\r\n").getBytes());
+                }
+            }
+            out.flush(); // 把缓存区内容压入文件  
+            out.close(); // 最后记得关闭文件  
+            reader.close();
+        } catch (Exception e) {  
+            e.printStackTrace();  
+        }  
 	}
 }
