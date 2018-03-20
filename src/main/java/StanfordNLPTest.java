@@ -1,7 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
+import java.util.*;
 
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.io.IOUtils;
@@ -18,136 +16,202 @@ import edu.stanford.nlp.util.StringUtils;
 public class StanfordNLPTest {
 
 	public static void main(String[] args) throws IOException {
-		// TODO Auto-generated method stub
-		//FileTest();
-		MyTest();
-		//chineseTest();
-		//newChineseTest();
-		//englishTest();
+		//generateTrainingText();
+		generateNERResult();
+		System.out.println("Done!");
 	}
-	public static void englishTest()
+
+	public static void generateTrainingText() throws IOException {
+
+		Map<String, String> dictFileNameToSymbol = new HashMap<String, String>() {
+			{
+				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\疾病词典.txt", "DISEASE");
+				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\药品词典.txt", "DRUG");
+				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\症状词典.txt", "SYMPTOM");
+			}
+		};
+		generateTrainingText(dictFileNameToSymbol, "O",
+				"C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\语料库\\生语料库.txt",
+				"C:\\Users\\wangy\\eclipse-workspace\\StanfordNLPApp\\NER\\input.txt");
+	}
+
+	public static void generateTrainingText(Map<String, String> dictFileNameToSymbol, String defaultSymbol,
+			String corpusFileName, String targetFileName) throws IOException {
+		// 获取词典
+		Map<Set<String>, String> dictToSymbol = new HashMap<>();
+		for (Map.Entry<String, String> dictFileNameAndSymbol : dictFileNameToSymbol.entrySet()) {
+			String dictFileName = dictFileNameAndSymbol.getKey();
+			String symbol = dictFileNameAndSymbol.getValue();
+			Set<String> dict = new HashSet<>();
+			BufferedReader reader = new BufferedReader(new FileReader(dictFileName));
+			String word = reader.readLine();
+			while (word != null && !word.isEmpty()) {
+				dict.add(word);
+				word = reader.readLine();
+			}
+			reader.close();
+			dictToSymbol.put(dict, symbol);
+		}
+		// 获取目标文件
+		FileOutputStream out = new FileOutputStream(new File(targetFileName));
+
+		// 分词
+		Annotation document = StanfordNLPWrapper.AnalyzeFromFile("ChineseSegmentation.properties", corpusFileName);
+		List<String> words = new ArrayList<>();
+		List<String> tags = new ArrayList<>();
+		for (CoreMap sentence : document.get(SentencesAnnotation.class)) {
+			words.clear();
+			tags.clear();
+			for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+				words.add(token.get(TextAnnotation.class));
+				// 默认标签为"O"
+				tags.add(defaultSymbol);
+			}
+			StringBuilder sb = new StringBuilder();
+			for (int i = 0; i < words.size(); i++) {
+				sb.delete(0, sb.length());
+				for (int j = i; j < words.size(); j++) {
+					// sb包括i,i+1,...,j组成的复合词，检查是否在词典中
+					sb.append(words.get(j));
+					// 如果在词典中则打上标签
+					for (Map.Entry<Set<String>, String> dictAndSymbol : dictToSymbol.entrySet()) {
+						Set<String> dict = dictAndSymbol.getKey();
+						String symbol = dictAndSymbol.getValue();
+						if (dict.contains(sb.toString()))
+							for (int k = i; k <= j; k++)
+								if (tags.get(k).equals(defaultSymbol))
+									tags.set(k, symbol);
+					}
+
+				}
+			}
+			for (int i = 0; i < words.size(); i++)
+				out.write((words.get(i) + "\t" + tags.get(i) + "\r\n").getBytes());
+		}
+		out.flush(); // 把缓存区内容压入文件
+		out.close();
+	}
+
+	public static void generateNERResult() throws IOException {
+		generateNERResult("ner-model-SYM-DRUG.properties", "O", "D:\\NLP\\Medical\\Paragraphs.txt",
+				"D:\\NLP\\Medical\\ParagraphsNER.txt", "D:\\NLP\\Medical\\*.txt");
+	}
+
+	public static void generateNERResult(String propertyFileName,  String defaultTag, String InputFilename, String targetFileName, String TagFileName) throws IOException
 	{
-		// creates a StanfordCoreNLP object, with POS tagging, lemmatization,
-        // NER, parsing, and coreference resolution
-        Properties props = new Properties();
-        props.setProperty("annotators", "tokenize, ssplit, pos, lemma, ner, parse, dcoref");
-        StanfordCoreNLP pipeline = new StanfordCoreNLP(props);
-
-        // read some text in the text variable
-        String text = "She went to America last week.";// Add your text here!
-        // create an empty Annotation just with the given text
-        Annotation document = new Annotation(text);
-
-        // run all Annotators on this text
-        pipeline.annotate(document);
-
-
-
-        // these are all the sentences in this document
-        // a CoreMap is essentially a Map that uses class objects as keys and
-        // has values with custom types
-        List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-
-        List<String> words = new ArrayList<>();
-        List<String> posTags = new ArrayList<>();
-        List<String> nerTags = new ArrayList<>();
-        for (CoreMap sentence : sentences) {
-            // traversing the words in the current sentence
-            // a CoreLabel is a CoreMap with additional token-specific methods
-            for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
-                // this is the text of the token
-                String word = token.get(TextAnnotation.class);
-                words.add(word);
-                // this is the POS tag of the token
-                String pos = token.get(PartOfSpeechAnnotation.class);
-                posTags.add(pos);
-                // this is the NER label of the token
-                String ne = token.get(NamedEntityTagAnnotation.class);
-                nerTags.add(ne);
-            }
-        }
-
-        System.out.println(words.toString());
-        System.out.println(posTags.toString());
-        System.out.println(nerTags.toString());
+		Annotation document = StanfordNLPWrapper.AnalyzeFromFile(propertyFileName, InputFilename);
+		FileOutputStream out = new FileOutputStream(new File(targetFileName));
+		
+		Map<String, Set<String>> tagToWords = new HashMap<>();
+		for (CoreMap sentence : document.get(SentencesAnnotation.class)) {
+			Map<String, List<String>> tagToWordsInSentence = new HashMap<>();
+			StringBuilder sentenceBuilder = new StringBuilder();
+			String lastTag = defaultTag;
+			StringBuilder wordBuilder = new StringBuilder();
+			
+			for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+				String word = token.get(TextAnnotation.class);
+				String tag = token.get(NamedEntityTagAnnotation.class);
+				sentenceBuilder.append(word);
+				if(tag == lastTag)
+					wordBuilder.append(word);
+				else {
+					if(!tagToWordsInSentence.containsKey(lastTag))
+						tagToWordsInSentence.put(lastTag, new LinkedList<>());
+					tagToWordsInSentence.get(lastTag).add(wordBuilder.toString());
+					lastTag = tag;
+					wordBuilder.replace(0, wordBuilder.length(),word);
+				}
+			}
+			//fill last word
+			if(wordBuilder.length() != 0)
+			{
+				if(!tagToWordsInSentence.containsKey(lastTag))
+					tagToWordsInSentence.put(lastTag, new LinkedList<>());
+				tagToWordsInSentence.get(lastTag).add(wordBuilder.toString());
+			}
+			sentenceBuilder.append("\n");
+			//deal with keywords
+			for(Map.Entry<String, List<String>> entry:tagToWordsInSentence.entrySet())
+			{
+				String tag = entry.getKey();
+				List<String> words = entry.getValue();
+				//skip the default tag
+				if(tag.equals(defaultTag)) continue;
+				//construct a line with a tag and corresponding words
+				sentenceBuilder.append("* ").append(tag).append(" :");
+				words.forEach(word->sentenceBuilder.append("  ").append(word));
+				sentenceBuilder.append("\n");
+				//insert the current words in the smallmap to the bigmap
+				if(!tagToWords.containsKey(tag))
+					tagToWords.put(tag, new HashSet<>());
+				tagToWords.get(tag).addAll(words);
+			}
+			out.write(sentenceBuilder.append("\n").toString().getBytes());
+		}
+		out.flush(); 
+		out.close();
+		
+		//write words with the same tag to a file
+		for(Map.Entry<String, Set<String>> entry : tagToWords.entrySet())
+		{
+			String tag = entry.getKey();
+			Set<String> words = entry.getValue();
+			StringBuilder sb = new StringBuilder();
+			words.forEach(s->sb.append(s).append("\n"));
+			String curTagFileName = TagFileName.replace("*", tag);
+			try(FileOutputStream curOut = new FileOutputStream(curTagFileName))
+			{
+				curOut.write(sb.toString().getBytes());
+			} catch(IOException e)
+			{
+				 System.out.println("An I/O Exception Occurred");
+			}
+		}
 	}
-	public static void newChineseTest() throws IOException
-	{
-		String text = "克林顿说，华盛顿将逐步落实对韩国的经济援助。"
-		        + "金大中对克林顿的讲话报以掌声：克林顿总统在会谈中重申，他坚定地支持韩国摆脱经济危机。";
-		Annotation document = new Annotation(text);
-		// Setup Chinese Properties by loading them from classpath resources
-		//Properties props = new Properties();
-		//props.load(IOUtils.readerFromString("StanfordCoreNLP-chinese.properties"));
-		// Or this way of doing it also works
-		Properties props = StringUtils.argsToProperties(new String[]{"-props", "StanfordCoreNLP-chinese.properties"});
-		StanfordCoreNLP corenlp = new StanfordCoreNLP(props);
-		corenlp.annotate(document);
 
-		corenlp.prettyPrint(document, System.out);
-	}
-	
-	public static void chineseTest()
-	{
-		String text = "She went to America last week.";
-		Annotation document = new Annotation(text);
-		StanfordCoreNLP corenlp = new StanfordCoreNLP("MyStanfordNLPChinese.properties");
-		corenlp.annotate(document);
-
-		corenlp.prettyPrint(document, System.out);
-	}
-	
-	public static void MyTest()
-	{
-		String text = "我感冒了，想喝口服液，感冒是一种疾病，常伴有头痛和发烧。";
-		Annotation document = new Annotation(text);
-		StanfordCoreNLP corenlp = new StanfordCoreNLP("test.properties");
-		corenlp.annotate(document);
-
-		corenlp.prettyPrint(document, System.out);
-	}
-	
-	
-	public static void FileTest() throws IOException
-	{
-		try { // 防止文件建立或读取失败，用catch捕捉错误并打印，也可以throw  
-            /* 读入TXT文件 */  
-            String pathname = "D:\\NLP\\TrainNERChinese\\无关小说.txt"; // 绝对路径或相对路径都可以，这里是绝对路径，写入文件时演示相对路径  
-            BufferedReader  reader = new BufferedReader(new FileReader(pathname));
-            String line = "";  
-            StringBuilder sb = new StringBuilder();//定义一个字符串缓存，将字符串存放缓存中
-            line = reader.readLine();  
-            while (line != null) {  
-                System.out.println(line);
-                sb.append(line + "\n");//将读取的字符串添加换行符后累加存放在缓存中
-                line = reader.readLine(); // 一次读入一行数据  
-            }  
-            String str = sb.toString();
-            System.out.println(str);
-        	Annotation document = new Annotation(str);
-    		StanfordCoreNLP corenlp = new StanfordCoreNLP("ChineseTest.properties");
-    		corenlp.annotate(document);
-    		
-    		FileOutputStream out = null;
-    		out = new FileOutputStream(new File("D:\\NLP\\TrainNERChinese\\无关小说分词.txt"));
-    		// these are all the sentences in this document
-            // a CoreMap is essentially a Map that uses class objects as keys and
-            // has values with custom types
-            List<CoreMap> sentences = document.get(SentencesAnnotation.class);
-            for (CoreMap sentence : sentences) {
-                // traversing the words in the current sentence
-                // a CoreLabel is a CoreMap with additional token-specific methods
-                for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
-                    // this is the text of the token
-                    String word = token.get(TextAnnotation.class);
-                    out.write((word+"\tO\r\n").getBytes());
-                }
-            }
-            out.flush(); // 把缓存区内容压入文件  
-            out.close(); // 最后记得关闭文件  
-            reader.close();
-        } catch (Exception e) {  
-            e.printStackTrace();  
-        }  
-	}
+	// public static void generateNERResult(String propertyFileName, String
+	// InputFilename, String targetFileName) throws IOException
+	// {
+	// Annotation document = StanfordNLPWrapper.AnalyzeFromFile(propertyFileName,
+	// InputFilename);
+	// FileOutputStream out = new FileOutputStream(new File(targetFileName));
+	//
+	// for (CoreMap sentence : document.get(SentencesAnnotation.class)) {
+	// StringBuilder sentenceBuilder = new StringBuilder();
+	// List<String> list = new LinkedList<>();
+	// String lastNerTag = "O";
+	// StringBuilder keyWordsBuilder = new StringBuilder();
+	//
+	// for (CoreLabel token : sentence.get(TokensAnnotation.class)) {
+	// String word = token.get(TextAnnotation.class);
+	// String curNerTag = token.get(NamedEntityTagAnnotation.class);
+	// sentenceBuilder.append(word);
+	// if(curNerTag == lastNerTag)
+	// {
+	// if(!curNerTag.equals("O"))
+	// keyWordsBuilder.append(word);
+	// } else {
+	// if(!lastNerTag.equals("O"))
+	// list.add(keyWordsBuilder.toString());
+	// if(!curNerTag.equals("O"))
+	// {
+	// keyWordsBuilder.delete(0, keyWordsBuilder.length());
+	// keyWordsBuilder.append(curNerTag+" "+word);
+	// }
+	// }
+	// lastNerTag = curNerTag;
+	// }
+	// if(!lastNerTag.equals("O"))
+	// list.add(keyWordsBuilder.toString());
+	// keyWordsBuilder.delete(0, keyWordsBuilder.length());
+	// for(String s : list)
+	// keyWordsBuilder.append(" ["+s+"]");
+	// String output =
+	// sentenceBuilder.append('\t').append(keyWordsBuilder).append('\n').toString();
+	// out.write(output.getBytes());
+	// }
+	// out.flush(); // 把缓存区内容压入文件
+	// out.close();
+	// }
 }
