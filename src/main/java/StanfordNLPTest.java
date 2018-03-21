@@ -2,16 +2,12 @@ import java.io.*;
 import java.util.*;
 
 import edu.stanford.nlp.ling.CoreLabel;
-import edu.stanford.nlp.io.IOUtils;
 import edu.stanford.nlp.ling.CoreAnnotations.NamedEntityTagAnnotation;
-import edu.stanford.nlp.ling.CoreAnnotations.PartOfSpeechAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.SentencesAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TextAnnotation;
 import edu.stanford.nlp.ling.CoreAnnotations.TokensAnnotation;
 import edu.stanford.nlp.pipeline.Annotation;
-import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
-import edu.stanford.nlp.util.StringUtils;
 
 public class StanfordNLPTest {
 
@@ -25,9 +21,9 @@ public class StanfordNLPTest {
 
 		Map<String, String> dictFileNameToSymbol = new HashMap<String, String>() {
 			{
-				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\疾病词典.txt", "DISEASE");
-				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\药品词典.txt", "DRUG");
-				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\症状词典.txt", "SYMPTOM");
+				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\disease.txt", "DISEASE");
+				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\drug.txt", "DRUG");
+				put("C:\\Users\\wangy\\git\\IntelligentHealthcare\\KeyWordsExtraction\\词典\\symptom.txt", "SYMPTOM");
 			}
 		};
 		generateTrainingText(dictFileNameToSymbol, "O",
@@ -93,7 +89,7 @@ public class StanfordNLPTest {
 	}
 
 	public static void generateNERResult() throws IOException {
-		generateNERResult("ner-model-SYM-DRUG.properties", "O", "D:\\NLP\\Medical\\Paragraphs.txt",
+		generateNERResult("old/ner-model-SYM-DRUG.properties", "O", "D:\\NLP\\Medical\\Paragraphs.txt",
 				"D:\\NLP\\Medical\\ParagraphsNER.txt", "D:\\NLP\\Medical\\*.txt");
 	}
 
