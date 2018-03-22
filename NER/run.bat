@@ -1,1 +1,0 @@
-java -cp stanford-ner.jar edu.stanford.nlp.ie.crf.CRFClassifier -prop prop.prop
