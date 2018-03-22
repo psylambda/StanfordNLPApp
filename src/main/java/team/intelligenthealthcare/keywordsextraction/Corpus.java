@@ -3,6 +3,7 @@ package team.intelligenthealthcare.keywordsextraction;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
 
 import java.io.*;
@@ -10,17 +11,29 @@ import java.util.*;
 
 public class Corpus {
 
-    public Corpus(String s) {
-        unmarkedCorpusFileName = s;
+    public Corpus(String s, int len)throws IOException {
+        unmarkedCorpus = MyUtils.readFileAsMultipleLines(s, len);
         markedCorpus = new LinkedList<>();
     }
 
-    //mark corpus with words in dicts, if not find ,tag with default tag.
+    //run stanfordCoreNLP
     //segmentationPropertyFileName is the name of property file for stanfordNLP.
-    public void mark(Dict d, String segmentationPropertyFileName, String defaultTag) throws IOException
+    public void tag(Dict d, String segmentationPropertyFileName, String defaultTag) throws IOException
     {
-        //run segmentation
-        Annotation document = MyUtils.AnalyzeFromFile(segmentationPropertyFileName, unmarkedCorpusFileName);
+        StanfordCoreNLP corenlp = new StanfordCoreNLP(segmentationPropertyFileName);
+        int i = 0;
+        for(String text : unmarkedCorpus) {
+            Annotation document = new Annotation(text);
+            corenlp.annotate(document);
+            parse(d, document, defaultTag);
+            i++;
+            System.out.println("[ "+i+" / "+unmarkedCorpus.size()+" ] of corpus has been parsed.");
+        }
+    }
+
+    //tag corpus with words in dicts, if not find ,tag with default tag.
+    public void parse(Dict d, Annotation document, String defaultTag) throws IOException
+    {
         List<String> words = new ArrayList<>();
         List<String> tags = new ArrayList<>();
         for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
@@ -80,8 +93,7 @@ public class Corpus {
     }
 
 
-    private String unmarkedCorpusFileName;
-
+    private List<String> unmarkedCorpus;
     //each element in the list is an array [word, tag].
     private List<String[]> markedCorpus;
 }

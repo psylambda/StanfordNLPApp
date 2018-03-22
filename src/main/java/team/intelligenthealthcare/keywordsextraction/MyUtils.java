@@ -19,6 +19,26 @@ public class MyUtils {
         return sb.toString();
     }
 
+    //each element in the result list contains multiple lines with length closed to "len".
+    public static List<String> readFileAsMultipleLines(String fileName, int len) throws IOException
+    {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(Thread.currentThread().getContextClassLoader().getSystemResourceAsStream(fileName)));
+        StringBuilder sb = new StringBuilder();
+        List<String> res = new LinkedList<>();
+        String line = reader.readLine();
+        while (line != null) {
+            sb.append(line + "\n");
+            line = reader.readLine();
+            if(sb.length() >= len) {
+                res.add(sb.toString());
+                sb.delete(0, sb.length());
+            }
+        }
+        res.add(sb.toString());
+        reader.close();
+        return res;
+    }
+
     //skip empty lines
     public static List<String> readFileAsLines(String fileName) throws IOException
     {
@@ -55,13 +75,25 @@ public class MyUtils {
 
     public static String getClassPath()
     {
-        return  Thread.currentThread().getContextClassLoader().getResource("").getFile();
+        return  Thread.currentThread().getContextClassLoader().getResource("").getPath();
     }
 
-    public static void mkdirIfNotExists(String fileName)
+    public static String getAbsolutePath(String fileName)
     {
-        File file = new File(fileName);
-        if(!file.exists())
-            file.mkdirs();
+        if(fileName.charAt(0) != '/' && fileName.charAt(0) != '\\')
+            fileName = getClassPath() + fileName;
+        return  fileName;
+    }
+
+    public static void mkdirForAFile(String fileName)
+    {
+        int lastIndex = fileName.lastIndexOf('/');
+        if(lastIndex != -1)
+        {
+            File folder = new File(fileName.substring(0, lastIndex));
+            if(!folder.exists())
+                folder.mkdirs();
+        }
+
     }
 }
