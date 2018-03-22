@@ -1,15 +1,31 @@
 package team.intelligenthealthcare.keywordsextraction;
 
-import java.io.*;
-import java.util.*;
 import com.alibaba.fastjson.JSON;
 import edu.stanford.nlp.ie.crf.CRFClassifier;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
 
 public class Main {
-
+    public static void testMaxMemorySize() {
+        List<Byte[]> list = new LinkedList<>();
+        long i = 0;
+        byte j = 0;
+        while (true) {
+            i++;
+            j++;
+            System.out.println(i);
+            list.add(new Byte[1 << 20]);
+        }
+    }
     public static void main(String[] args)
     {
+        SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {
             //read the property file
@@ -18,25 +34,37 @@ public class Main {
             property.load(is);
             //if true, then do corpusGeneration
             if(Boolean.parseBoolean((String)property.getOrDefault("corpusGeneration", false))) {
+                long startTime = System.currentTimeMillis();
+                System.out.println("corpusGeneration phase starts: " + df.format(startTime));
                 corpusGeneration(property);
-                System.out.println("corpusGeneration successfully done!");
+                long endTime = System.currentTimeMillis();
+                System.out.println("corpusGeneration phase ends: " + df.format(endTime));
+                System.out.println("corpusGeneration phase costs " + Float.toString((endTime - startTime) / 1000F) + " seconds.");
             }
 
             //if true, then do modelTraining
             if(Boolean.parseBoolean((String)property.getOrDefault("modelTraining", false))) {
+                long startTime = System.currentTimeMillis();
+                System.out.println("modelTraining phase starts: " + df.format(startTime));
                 modelTraining(property);
-                System.out.println("modelTraining successfully done!");
+                long endTime = System.currentTimeMillis();
+                System.out.println("modelTraining phase ends: " + df.format(endTime));
+                System.out.println("modelTraining phase costs " + Float.toString((endTime - startTime) / 1000F) + " seconds.");
             }
 
             //if true, then do keywordsExtraction
             if(Boolean.parseBoolean((String)property.getOrDefault("keywordsExtraction", false))) {
+                long startTime = System.currentTimeMillis();
+                System.out.println("keywordsExtraction phase starts: " + df.format(startTime));
                 keywordsExtraction(property);
-                System.out.println("keywordsExtraction successfully done!");
+                long endTime = System.currentTimeMillis();
+                System.out.println("keywordsExtraction phase ends: " + df.format(endTime));
+                System.out.println("keywordsExtraction phase costs " + Float.toString((endTime - startTime) / 1000F) + " seconds.");
             }
         } catch(Exception e) {
             e.printStackTrace();
         }
-        System.out.println("end!");
+        System.out.println("done!");
     }
 
 
