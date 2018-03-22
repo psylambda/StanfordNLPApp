@@ -51,7 +51,17 @@ public class MyUtils {
     public static Annotation AnalyzeFromFile(String propertyFileName, String inputFileName) throws IOException
     {
         return  AnalyzeFromString(propertyFileName, readFileAsString(inputFileName));
-        //StanfordCoreNLP corenlp = new StanfordCoreNLP(propertyFileName);
-        //corenlp.processFiles(new File(Thread.currentThread().getContextClassLoader().getResource("").getFile()+outputFileName));
+    }
+
+    public static String getClassPath()
+    {
+        return  Thread.currentThread().getContextClassLoader().getResource("").getFile();
+    }
+
+    public static void mkdirIfNotExists(String fileName)
+    {
+        File file = new File(fileName);
+        if(!file.exists())
+            file.mkdirs();
     }
 }
