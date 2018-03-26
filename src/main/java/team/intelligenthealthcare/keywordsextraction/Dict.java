@@ -1,7 +1,10 @@
 package team.intelligenthealthcare.keywordsextraction;
 
-import java.io.*;
-import java.util.*;
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class Dict {
 

@@ -2,8 +2,12 @@ package team.intelligenthealthcare.keywordsextraction;
 
 import edu.stanford.nlp.pipeline.*;
 
-import java.io.*;
-import java.util.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.LinkedList;
+import java.util.List;
 
 public class MyUtils {
     public static String readFileAsString(String fileName) throws IOException
@@ -12,7 +16,7 @@ public class MyUtils {
         StringBuilder sb = new StringBuilder();
         String line = reader.readLine();
         while (line != null) {
-            sb.append(line + "\n");
+            sb.append(line).append("\n");
             line = reader.readLine();
         }
         reader.close();
