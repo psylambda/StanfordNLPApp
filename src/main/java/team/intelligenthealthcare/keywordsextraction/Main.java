@@ -77,7 +77,7 @@ public class Main {
 
         //read corpus
         Corpus corpus = new Corpus(property.getProperty("corpusGeneration.unmarkedCorpusFileName"),property.containsKey("corpusGeneration.fileLengthEachIteration")?Integer.parseInt(property.getProperty("corpusGeneration.fileLengthEachIteration")):Integer.MAX_VALUE);
-        corpus.tag(dict, property.getProperty("corpusGeneration.propertyFileName"),  property.getProperty("defaultTag"));
+        corpus.tag(dict, property.getProperty("corpusGeneration.propertyFileName"), property.getProperty("corpusGeneration.defaultTag"));
 
         //write corpus
         corpus.writeMarkedCorpusToFile(property.getProperty("corpusGeneration.markedCorpusFileName"));
