@@ -2,7 +2,7 @@
 
 ## 主要内容
 - [项目功能](#Funciton)
-- [项目结构](#Stcture)
+- [项目结构](#Structure)
 - [使用方法](#HowToUse)
 - [内部实现](#Implementation)
 
