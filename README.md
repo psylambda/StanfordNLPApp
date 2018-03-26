@@ -13,7 +13,7 @@
 3. 从文本中提取文本关键词
 
 
-## <h2 id="Sturcture">项目结构</h2>
+## <h2 id="Structure">项目结构</h2>
 整个项目是在IntelliJ IDEA下开发的Java项目,使用Maven管理包依赖.
 
 -  /lib 存放stanford NER的jar包
