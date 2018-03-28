@@ -31,14 +31,18 @@ public class MyUtils {
         List<String> res = new LinkedList<>();
         String line = reader.readLine();
         while (line != null) {
-            sb.append(line + "\n");
-            line = reader.readLine();
-            if(sb.length() >= len) {
+            //now we have a line and a sb
+            if (sb.length() != 0 && sb.length() + line.length() > len) {
+
                 res.add(sb.toString());
                 sb.delete(0, sb.length());
+            } else {
+                sb.append(line + "\n");
+                line = reader.readLine();
             }
         }
-        res.add(sb.toString());
+        if (sb.length() != 0)
+            res.add(sb.toString());
         reader.close();
         return res;
     }
@@ -89,15 +93,34 @@ public class MyUtils {
         return  fileName;
     }
 
-    public static void mkdirForAFile(String fileName)
-    {
+    public static void mkdirForAFile(String fileName) {
         int lastIndex = fileName.lastIndexOf('/');
-        if(lastIndex != -1)
-        {
+        if(lastIndex != -1) {
             File folder = new File(fileName.substring(0, lastIndex));
             if(!folder.exists())
                 folder.mkdirs();
         }
-
     }
+
+
+    public static boolean isFileExists(String fileName) {
+        File file = new File(fileName);
+        return file.exists();
+    }
+
+    public static String getAllFileName(String fileName) {
+        int i = 1;
+        StringBuilder res = new StringBuilder();
+        while (true) {
+            String cur = fileName.replace("*", String.valueOf(i));
+            if (!isFileExists(cur)) break;
+            if (i != 1) {
+                res.append(",");
+            }
+            res.append(cur);
+            i++;
+        }
+        return res.toString();
+    }
+
 }
