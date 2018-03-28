@@ -77,10 +77,7 @@ public class Main {
 
         //read corpus
         Corpus corpus = new Corpus(property.getProperty("corpusGeneration.unmarkedCorpusFileName"),property.containsKey("corpusGeneration.fileLengthEachIteration")?Integer.parseInt(property.getProperty("corpusGeneration.fileLengthEachIteration")):Integer.MAX_VALUE);
-        corpus.tag(dict, property.getProperty("corpusGeneration.propertyFileName"), property.getProperty("corpusGeneration.defaultTag"));
-
-        //write corpus
-        corpus.writeMarkedCorpusToFile(property.getProperty("corpusGeneration.markedCorpusFileName"));
+        corpus.tag(dict, property.getProperty("corpusGeneration.propertyFileName"), property.getProperty("corpusGeneration.defaultTag"), property.getProperty("corpusGeneration.markedCorpusFileNames"));
     }
 
 
@@ -89,8 +86,8 @@ public class Main {
         String[] crfArgs = new String[6];
         crfArgs[0] = "-prop";
         crfArgs[1] = property.getProperty("modelTraining.propertyFileName");
-        crfArgs[2] = "-trainFile";
-        crfArgs[3] = MyUtils.getClassPath()+property.getProperty("modelTraining.markedCorpusFileName");
+        crfArgs[2] = "-trainFileList";
+        crfArgs[3] = MyUtils.getAllFileName(MyUtils.getClassPath() + property.getProperty("modelTraining.markedCorpusFileNames"));
         crfArgs[4] = "-serializeTo";
         crfArgs[5] = MyUtils.getClassPath()+property.getProperty("modelTraining.modelFileName");
         //if the directory has not been created, create one.

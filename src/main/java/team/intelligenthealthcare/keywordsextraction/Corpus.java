@@ -13,32 +13,33 @@ public class Corpus {
 
     public Corpus(String s, int len)throws IOException {
         unmarkedCorpus = MyUtils.readFileAsMultipleLines(s, len);
-        markedCorpus = new LinkedList<>();
     }
 
     //run stanfordCoreNLP
     //segmentationPropertyFileName is the name of property file for stanfordNLP.
-    public void tag(Dict d, String segmentationPropertyFileName, String defaultTag) throws IOException
+    public void tag(Dict d, String segmentationPropertyFileName, String defaultTag, String markedCorpusFileNames) throws IOException
     {
         StanfordCoreNLP corenlp = new StanfordCoreNLP(segmentationPropertyFileName);
         int i = 0;
         for(String text : unmarkedCorpus) {
             Annotation document = new Annotation(text);
             corenlp.annotate(document);
-            parse(d, document, defaultTag);
+            parse(d, document, defaultTag, markedCorpusFileNames.replace("*", String.valueOf(i + 1)));
             i++;
-            System.out.println("[ "+i+" / "+unmarkedCorpus.size()+" ] of corpus has been parsed.");
+            System.out.println("[ " + i + " / " + unmarkedCorpus.size() + " ] of corpus has been analyzed. Totally " + text.length() + " bytes. " + new Date());
         }
     }
 
     //tag corpus with words in dicts, if not find ,tag with default tag.
-    public void parse(Dict d, Annotation document, String defaultTag) throws IOException
+    public void parse(Dict d, Annotation document, String defaultTag, String markedCorpusFileName) throws IOException
     {
         List<String> words = new ArrayList<>();
         List<String> tags = new ArrayList<>();
+        List<List<String>> allWords = new ArrayList<>();
+        List<List<String>> allTags = new ArrayList<>();
         for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
-            words.clear();
-            tags.clear();
+            words = new ArrayList<>();
+            tags = new ArrayList<>();
             for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                 //get each word in a sentence
                 words.add(token.get(CoreAnnotations.TextAnnotation.class));
@@ -73,27 +74,33 @@ public class Corpus {
                     }
                 }
             }
-            //now we have analyzed the sentence, add the results to markedCorpus
-            for (int i = 0; i < words.size(); i++) {
-                String[] pair = new String[2];
-                pair[0] = words.get(i);
-                pair[1] = tags.get(i);
-                markedCorpus.add(pair);
-            }
+
+            allWords.add(words);
+            allTags.add(tags);
         }
+        //now we have analyzed the small file, write the results.
+        writeMarkedCorpusToFile(markedCorpusFileName, allWords, allTags);
     }
 
 
-    public void writeMarkedCorpusToFile(String outputFileName) throws IOException
+    public void writeMarkedCorpusToFile(String outputFileName, List<List<String>> words, List<List<String>> tags) throws IOException
     {
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(Thread.currentThread().getContextClassLoader().getResource("").getFile()+outputFileName))));
-        for(String[] s : markedCorpus)
-            writer.write(s[0]+"\t"+s[1]+"\r\n");
+        //System.out.println("write marked corpus "+outputFileName);
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(Thread.currentThread().getContextClassLoader().getResource("").getFile() + outputFileName))));
+
+        for (int i = 0; i < Math.min(words.size(), tags.size()); i++) {
+            List<String> wordsInASentence = words.get(i);
+            List<String> tagsInASentence = tags.get(i);
+            for (int j = 0; j < Math.min(wordsInASentence.size(), tagsInASentence.size()); j++) {
+                writer.write(wordsInASentence.get(j) + "\t" + tagsInASentence.get(j) + "\r\n");
+            }
+            writer.write("\r\n");
+        }
+
+        writer.flush();
         writer.close();
     }
 
 
     private List<String> unmarkedCorpus;
-    //each element in the list is an array [word, tag].
-    private List<String[]> markedCorpus;
 }
