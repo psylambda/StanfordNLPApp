@@ -1,5 +1,6 @@
 /target/
 
+#*.ser.gz
 # Compiled class file
 *.class
 
