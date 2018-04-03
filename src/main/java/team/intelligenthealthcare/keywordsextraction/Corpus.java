@@ -11,32 +11,40 @@ import java.util.*;
 
 public class Corpus {
 
+    private List<List<String>> allWords = new ArrayList<>();
+    private List<List<String>> allTags = new ArrayList<>();
+
+    //input is just the content
+    public Corpus(String input) {
+        unmarkedCorpus = new ArrayList<>();
+        unmarkedCorpus.add(input);
+    }
+
+    //s is the file name, len is max length of each file
     public Corpus(String s, int len)throws IOException {
         unmarkedCorpus = MyUtils.readFileAsMultipleLines(s, len);
     }
 
     //run stanfordCoreNLP
     //segmentationPropertyFileName is the name of property file for stanfordNLP.
-    public void tag(Dict d, String segmentationPropertyFileName, String defaultTag, String markedCorpusFileNames) throws IOException
+    public void tag(Dict d, String segmentationPropertyFileName, String defaultTag) throws IOException
     {
         StanfordCoreNLP corenlp = new StanfordCoreNLP(segmentationPropertyFileName);
         int i = 0;
         for(String text : unmarkedCorpus) {
             Annotation document = new Annotation(text);
             corenlp.annotate(document);
-            parse(d, document, defaultTag, markedCorpusFileNames.replace("*", String.valueOf(i + 1)));
+            parse(d, document, defaultTag);
             i++;
             System.out.println("[ " + i + " / " + unmarkedCorpus.size() + " ] of corpus has been analyzed. Totally " + text.length() + " bytes. " + new Date());
         }
     }
 
     //tag corpus with words in dicts, if not find ,tag with default tag.
-    public void parse(Dict d, Annotation document, String defaultTag, String markedCorpusFileName) throws IOException
+    public void parse(Dict d, Annotation document, String defaultTag) throws IOException
     {
         List<String> words = new ArrayList<>();
         List<String> tags = new ArrayList<>();
-        List<List<String>> allWords = new ArrayList<>();
-        List<List<String>> allTags = new ArrayList<>();
         for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
             words = new ArrayList<>();
             tags = new ArrayList<>();
@@ -78,19 +86,18 @@ public class Corpus {
             allWords.add(words);
             allTags.add(tags);
         }
-        //now we have analyzed the small file, write the results.
-        writeMarkedCorpusToFile(markedCorpusFileName, allWords, allTags);
+
     }
 
-
-    public void writeMarkedCorpusToFile(String outputFileName, List<List<String>> words, List<List<String>> tags) throws IOException
+    //now we have analyzed the small file, write the results.
+    public void writeMarkedCorpusToFile(String markedCorpusFileName) throws IOException
     {
         //System.out.println("write marked corpus "+outputFileName);
-        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(Thread.currentThread().getContextClassLoader().getResource("").getFile() + outputFileName))));
+        BufferedWriter writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(new File(Thread.currentThread().getContextClassLoader().getResource("").getFile() + markedCorpusFileName))));
 
-        for (int i = 0; i < Math.min(words.size(), tags.size()); i++) {
-            List<String> wordsInASentence = words.get(i);
-            List<String> tagsInASentence = tags.get(i);
+        for (int i = 0; i < Math.min(allWords.size(), allTags.size()); i++) {
+            List<String> wordsInASentence = allWords.get(i);
+            List<String> tagsInASentence = allTags.get(i);
             for (int j = 0; j < Math.min(wordsInASentence.size(), tagsInASentence.size()); j++) {
                 writer.write(wordsInASentence.get(j) + "\t" + tagsInASentence.get(j) + "\r\n");
             }
@@ -101,6 +108,13 @@ public class Corpus {
         writer.close();
     }
 
-
     private List<String> unmarkedCorpus;
+
+    public List<List<String>> getAllWords() {
+        return allWords;
+    }
+
+    public List<List<String>> getAllTags() {
+        return allTags;
+    }
 }
