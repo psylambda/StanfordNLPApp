@@ -10,7 +10,7 @@
         <module name="StanfordNLPApp" />
       </profile>
     </annotationProcessing>
-    <bytecodeTargetLevel>
+    <bytecodeTargetLevel target="9">
       <module name="StanfordNLPApp" target="1.9" />
     </bytecodeTargetLevel>
   </component>
