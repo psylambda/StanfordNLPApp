@@ -8,7 +8,7 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
-public class Main {
+public class Tagger {
 
     /**
      * Return an array of tagged words by simply matching for words in dicts
@@ -34,7 +34,7 @@ public class Main {
         List<List<String>> allWords = corpus.getAllWords();
         List<List<String>> allTags = corpus.getAllTags();
         List<String[]> wordToTag = new ArrayList<>();
-        String defaultTag = property.getProperty("corpusGeneration.defaultTag");
+        String defaultTag = property.getProperty("keywordsExtraction.defaultTag");
         for (int i = 0; i < allWords.size(); i++) {
             StringBuilder wordBuilder = new StringBuilder();
             String lastTag = defaultTag;
@@ -42,10 +42,9 @@ public class Main {
                 String word = allWords.get(i).get(j);
                 String tag = allTags.get(i).get(j);
                 //put adjacent words with the same tag together
-                if (tag.equals(lastTag))
+                if (!tag.equals(defaultTag) && tag.equals(lastTag))
                     wordBuilder.append(word);
                 else {
-
                     if (wordBuilder.length() > 0) {
                         //construct wordToTag
                         String[] wordAndTag = new String[2];
@@ -104,29 +103,28 @@ public class Main {
 //        InputStream is = Thread.currentThread().getContextClassLoader().getSystemResourceAsStream("keywordsExtraction.properties");
 //        property.load(is);
 //
-//        //String s="慢性支气管炎(chronic bronchitis)是指气管、支气管黏膜及其周围组织的慢\n" +
-//                //"性非特异性炎症。临床上以反复发作的咳嗽、咳痰或伴有喘鸣音为特征。上述临床症状每年持续3个月，连续发生2年以上，即可诊断为慢性支气管炎。";
-//        String s = MyUtils.readFileAsString(property.getProperty("keywordsExtraction.inputFileName"));
+//        String s="慢性支气管炎以咳嗽、咳痰或伴有喘鸣音为特征。";
+//        //String s = MyUtils.readFileAsString(property.getProperty("keywordsExtraction.inputFileName"));
 //        String[][] a = tagByStringMatching(s);
-//       //String[][] b = tagByNER(s);
+//       String[][] b = tagByNER(s);
 //
 //        for(String[] i : a)
 //        {
 //            System.out.println(i[0]+"\t"+i[1]);
 //        }
-////        System.out.println("");
-////        System.out.println("");
-////        System.out.println("");
-////        System.out.println("");
-////        System.out.println("");
-////        System.out.println("");
-////        System.out.println("");
-////        System.out.println("");
-////        System.out.println("");
-////        for(String[] i : b)
-////        {
-////            System.out.println(i[0]+"\t"+i[1]);
-////        }
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+//        System.out.println("");
+//        for(String[] i : b)
+//        {
+//            System.out.println(i[0]+"\t"+i[1]);
+//        }
 //    }
 
     public static void testMaxMemorySize() {

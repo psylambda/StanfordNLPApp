@@ -70,7 +70,7 @@ public class KeywordsExtraction {
                 String tag = token.get(CoreAnnotations.NamedEntityTagAnnotation.class);
                 sentenceBuilder.append(word);
                 //put adjacent words with the same tag together
-                if (tag.equals(lastTag))
+                if (!tag.equals(defaultTag) && tag.equals(lastTag))
                     wordBuilder.append(word);
                 else {
                     if (wordBuilder.length() != 0) {
