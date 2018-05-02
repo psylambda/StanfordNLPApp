@@ -43,8 +43,7 @@ public class Corpus {
     //tag corpus with words in dicts, if not find ,tag with default tag.
     public void parse(Dict d, Annotation document, String defaultTag) throws IOException
     {
-        List<String> words = new ArrayList<>();
-        List<String> tags = new ArrayList<>();
+        List<String> words, tags;
         for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
             words = new ArrayList<>();
             tags = new ArrayList<>();

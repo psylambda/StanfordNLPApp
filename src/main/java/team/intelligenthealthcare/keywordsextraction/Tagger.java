@@ -13,9 +13,9 @@ public class Tagger {
     /**
      * Return an array of tagged words by simply matching for words in dicts
      *
-     * @Return res[i][0]:word   res[i][1]:tag
+     * @Return in ith sentence and jth word, res[i][0][j]:word   res[i][1][j]:tag
      */
-    public static String[][] tagByStringMatching(String input) throws IOException {
+    public static String[][][] tagByStringMatching(String input) throws IOException {
         //read dict files
         Properties property = new Properties();
         InputStream is = Thread.currentThread().getContextClassLoader().getSystemResourceAsStream("keywordsExtraction.properties");
@@ -33,11 +33,14 @@ public class Tagger {
         //prepare to return
         List<List<String>> allWords = corpus.getAllWords();
         List<List<String>> allTags = corpus.getAllTags();
-        List<String[]> wordToTag = new ArrayList<>();
+        List<String[][]> res = new ArrayList<>();
+        //List<String[]> wordToTag = new ArrayList<>();
         String defaultTag = property.getProperty("keywordsExtraction.defaultTag");
         for (int i = 0; i < allWords.size(); i++) {
             StringBuilder wordBuilder = new StringBuilder();
             String lastTag = defaultTag;
+            List<String> wordList = new ArrayList<>();
+            List<String> tagList = new ArrayList<>();
             for (int j = 0; j < allWords.get(i).size(); j++) {
                 String word = allWords.get(i).get(j);
                 String tag = allTags.get(i).get(j);
@@ -47,10 +50,12 @@ public class Tagger {
                 else {
                     if (wordBuilder.length() > 0) {
                         //construct wordToTag
-                        String[] wordAndTag = new String[2];
-                        wordAndTag[0] = wordBuilder.toString();
-                        wordAndTag[1] = lastTag;
-                        wordToTag.add(wordAndTag);
+                        //String[] wordAndTag = new String[2];
+                        //wordAndTag[0] = wordBuilder.toString();
+                        //wordAndTag[1] = lastTag;
+                        //wordToTag.add(wordAndTag);
+                        wordList.add(wordBuilder.toString());
+                        tagList.add(lastTag);
                         wordBuilder.replace(0, wordBuilder.length(), word);
                     } else
                         wordBuilder.append(word);
@@ -60,25 +65,29 @@ public class Tagger {
             //fill last word
             if (wordBuilder.length() != 0) {
                 //construct wordToTag
-                String[] wordAndTag = new String[2];
-                wordAndTag[0] = wordBuilder.toString();
-                wordAndTag[1] = lastTag;
-                wordToTag.add(wordAndTag);
+//                String[] wordAndTag = new String[2];
+//                wordAndTag[0] = wordBuilder.toString();
+//                wordAndTag[1] = lastTag;
+//                wordToTag.add(wordAndTag);
+                wordList.add(wordBuilder.toString());
+                tagList.add(lastTag);
             }
 //            String[] wordAndTag = new String[2];
 //            wordAndTag[0] = "sentence";
 //            wordAndTag[1] = "sentence";
 //            wordToTag.add(wordAndTag);
+            String[][] resInSentence = new String[2][wordList.size()];
+            resInSentence[0] = wordList.toArray(resInSentence[0]);
+            resInSentence[1] = tagList.toArray(resInSentence[1]);
+            res.add(resInSentence);
         }
-
-
 //        allWords.forEach(sentence -> words.addAll(sentence));
 //        allTags.forEach(sentence -> tags.addAll(sentence));
 //        String[][] res = new String[words.size()][2];
 //        for (int i = 0; i < words.size(); i++) {
 //            res[i][0] = words.get(i);
 //            res[i][1] = tags.get(i);
-        return wordToTag.toArray(new String[0][]);
+        return res.toArray(new String[res.size()][][]);
     }
 
     /**
@@ -86,7 +95,7 @@ public class Tagger {
      *
      * @Return res[i][0]:word   res[i][1]:tag
      */
-    public static String[][] tagByNER(String input) throws IOException {
+    public static String[][][] tagByNER(String input) throws IOException {
         //read dict files
         Properties property = new Properties();
         InputStream is = Thread.currentThread().getContextClassLoader().getSystemResourceAsStream("keywordsExtraction.properties");
@@ -94,23 +103,28 @@ public class Tagger {
 
         KeywordsExtraction ext = new KeywordsExtraction();
         ext.extractKeywordsFromString(property.getProperty("keywordsExtraction.propertyFileName"), (String) property.getOrDefault("keywordsExtraction.defaultTag", "O"), input);
-        return ext.getWordToTag().toArray(new String[0][]);
+        return ext.getResult().toArray(new String[ext.getResult().size()][][]);
     }
 
-//    public static void main(String[] args) throws IOException{
-//        //read dict files
-//        Properties property = new Properties();
-//        InputStream is = Thread.currentThread().getContextClassLoader().getSystemResourceAsStream("keywordsExtraction.properties");
-//        property.load(is);
-//
-//        String s="慢性支气管炎以咳嗽、咳痰或伴有喘鸣音为特征。";
-//        //String s = MyUtils.readFileAsString(property.getProperty("keywordsExtraction.inputFileName"));
-//        String[][] a = tagByStringMatching(s);
-//       String[][] b = tagByNER(s);
-//
-//        for(String[] i : a)
+    public static void mainx(String[] args) throws IOException {
+        //read dict files
+        Properties property = new Properties();
+        InputStream is = Thread.currentThread().getContextClassLoader().getSystemResourceAsStream("keywordsExtraction.properties");
+        property.load(is);
+
+        String s = "慢性支气管炎(chronic bronchitis)是指气管、支气管黏膜及其周围组织的慢\n" +
+                "性非特异性炎症。临床上以反复发作的咳嗽、咳痰或伴有喘鸣音为特征。上述临床症状每年持续3个月，连续发生2年以上，即可诊断为慢性支气管炎。";
+        //String s = MyUtils.readFileAsString(property.getProperty("keywordsExtraction.inputFileName"));
+//        String[][][] a = tagByStringMatching(s);
+//        for(String[][] i : a)
 //        {
-//            System.out.println(i[0]+"\t"+i[1]);
+//            for(String[] j: i)
+//            {
+//                for(String k: j)
+//                    System.out.print(k+"\t");
+//                System.out.print("\n");
+//            }
+//            System.out.print("\n");
 //        }
 //        System.out.println("");
 //        System.out.println("");
@@ -121,11 +135,22 @@ public class Tagger {
 //        System.out.println("");
 //        System.out.println("");
 //        System.out.println("");
-//        for(String[] i : b)
-//        {
-//            System.out.println(i[0]+"\t"+i[1]);
-//        }
-//    }
+
+
+        String[][][] b = tagByNER(s);
+
+//        for(int i = 0; i < 100; i++)
+//            b = tagByNER(s);
+
+        for (String[][] i : b) {
+            for (String[] j : i) {
+                for (String k : j)
+                    System.out.print(k + "\t");
+                System.out.print("\n");
+            }
+            System.out.print("\n");
+        }
+    }
 
     public static void testMaxMemorySize() {
         List<Byte[]> list = new LinkedList<>();
@@ -140,6 +165,14 @@ public class Tagger {
     }
 
     public static void main(String[] args) {
+//        String path = String.format("%s/%s", System.getProperty("user.dir"), Tagger.class.getPackage().getName().replace(".", "/"));
+//        System.out.println(path);
+//        System.out.println(System.getProperty("user.dir"));
+//        System.out.println(Tagger.class.getPackage().getName());
+        ner(args);
+    }
+
+    public static void ner(String[] args) {
         SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
         try {

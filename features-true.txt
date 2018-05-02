@@ -1,13 +1,7 @@
-慢性 JJ null	###|C #<慢#|C #<慢性#|C #<慢性>#|C #性>#|C #慢性>#|C -DISJP|C -PW|C 、-DISJN|C 以-DISJN|C 咳嗽-DISJN|C 慢性-WORD|C 支气管炎-DISJN|C 支气管炎-NW|C   -PSEQpW|CpC -TPS2|CpC -慢性-PSEQW2|CpC PSEQ|CpC null-TNS1|CpC 慢性-PSEQW|CpC  
-支气管炎 NN null	###|C #<支#|C #<支气#|C #<支气管#|C #<支气管炎#|C #<支气管炎>#|C #支气管炎>#|C #气管炎>#|C #炎>#|C #管炎>#|C -DISJP|C 、-DISJN|C 以-DISJN|C 以-NW|C 咳嗽-DISJN|C 咳痰-DISJN|C 慢性-DISJP|C 慢性-PW|C 支气管炎-WORD|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 慢性-PSEQpW|CpC 慢性-支气管炎-PSEQW2|CpC 支气管炎-PSEQW|CpC  
-以 P null	###|C #<以#|C #<以>#|C #以>#|C -DISJP|C 、-DISJN|C 以-WORD|C 咳嗽-DISJN|C 咳嗽-NW|C 咳痰-DISJN|C 慢性-DISJP|C 或-DISJN|C 支气管炎-DISJP|C 支气管炎-PW|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 以-PSEQW|CpC 支气管炎-PSEQpW|CpC 支气管炎-以-PSEQW2|CpC  
-咳嗽 VV null	###|C #<咳#|C #<咳嗽#|C #<咳嗽>#|C #咳嗽>#|C #嗽>#|C -DISJP|C 、-DISJN|C 、-NW|C 以-DISJP|C 以-PW|C 伴有-DISJN|C 咳嗽-WORD|C 咳痰-DISJN|C 慢性-DISJP|C 或-DISJN|C 支气管炎-DISJP|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 以-PSEQpW|CpC 以-咳嗽-PSEQW2|CpC 咳嗽-PSEQW|CpC  
-、 PU null	###|C #<、#|C #<、>#|C #、>#|C 、-WORD|C 以-DISJP|C 伴有-DISJN|C 咳嗽-DISJP|C 咳嗽-PW|C 咳痰-DISJN|C 咳痰-NW|C 喘鸣-DISJN|C 慢性-DISJP|C 或-DISJN|C 支气管炎-DISJP|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 、-PSEQW|CpC 咳嗽-PSEQpW|CpC 咳嗽-、-PSEQW2|CpC  
-咳痰 NN null	###|C #<咳#|C #<咳痰#|C #<咳痰>#|C #咳痰>#|C #痰>#|C 、-DISJP|C 、-PW|C 以-DISJP|C 伴有-DISJN|C 咳嗽-DISJP|C 咳痰-WORD|C 喘鸣-DISJN|C 或-DISJN|C 或-NW|C 支气管炎-DISJP|C 音-DISJN|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 、-PSEQpW|CpC 、-咳痰-PSEQW2|CpC 咳痰-PSEQW|CpC  
-或 CC null	###|C #<或#|C #<或>#|C #或>#|C 、-DISJP|C 为-DISJN|C 以-DISJP|C 伴有-DISJN|C 伴有-NW|C 咳嗽-DISJP|C 咳痰-DISJP|C 咳痰-PW|C 喘鸣-DISJN|C 或-WORD|C 音-DISJN|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 咳痰-PSEQpW|CpC 咳痰-或-PSEQW2|CpC 或-PSEQW|CpC  
-伴有 VV null	###|C #<伴#|C #<伴有#|C #<伴有>#|C #伴有>#|C #有>#|C 、-DISJP|C 为-DISJN|C 伴有-WORD|C 咳嗽-DISJP|C 咳痰-DISJP|C 喘鸣-DISJN|C 喘鸣-NW|C 或-DISJP|C 或-PW|C 特征-DISJN|C 音-DISJN|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 伴有-PSEQW|CpC 或-PSEQpW|CpC 或-伴有-PSEQW2|CpC  
-喘鸣 VV null	###|C #<喘#|C #<喘鸣#|C #<喘鸣>#|C #喘鸣>#|C #鸣>#|C 、-DISJP|C 。-DISJN|C 为-DISJN|C 伴有-DISJP|C 伴有-PW|C 咳痰-DISJP|C 喘鸣-WORD|C 或-DISJP|C 特征-DISJN|C 音-DISJN|C 音-NW|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 伴有-PSEQpW|CpC 伴有-喘鸣-PSEQW2|CpC 喘鸣-PSEQW|CpC  
-音 NN null	###|C #<音#|C #<音>#|C #音>#|C -DISJN|C 。-DISJN|C 为-DISJN|C 为-NW|C 伴有-DISJP|C 咳痰-DISJP|C 喘鸣-DISJP|C 喘鸣-PW|C 或-DISJP|C 特征-DISJN|C 音-WORD|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 喘鸣-PSEQpW|CpC 喘鸣-音-PSEQW2|CpC 音-PSEQW|CpC  
-为 VC null	###|C #<为#|C #<为>#|C #为>#|C -DISJN|C 。-DISJN|C 为-WORD|C 伴有-DISJP|C 喘鸣-DISJP|C 或-DISJP|C 特征-DISJN|C 特征-NW|C 音-DISJP|C 音-PW|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 为-PSEQW|CpC 音-PSEQpW|CpC 音-为-PSEQW2|CpC  
-特征 NN null	###|C #<特#|C #<特征#|C #<特征>#|C #征>#|C #特征>#|C -DISJN|C 。-DISJN|C 。-NW|C 为-DISJP|C 为-PW|C 伴有-DISJP|C 喘鸣-DISJP|C 特征-WORD|C 音-DISJP|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 为-PSEQpW|CpC 为-特征-PSEQW2|CpC 特征-PSEQW|CpC  
-。 PU null	###|C #<。#|C #<。>#|C #。>#|C -DISJN|C -NW|C 。-WORD|C 为-DISJP|C 喘鸣-DISJP|C 特征-DISJP|C 特征-PW|C 音-DISJP|C   -TPS2|CpC PSEQ|CpC null-TNS1|CpC 。-PSEQW|CpC 特征-PSEQpW|CpC 特征-。-PSEQW2|CpC  
+有-WORD|C
+糖尿病-WORD|C
+有-PW|C
+我-WORD|C
+-PW|C
+我-PW|C
+###|C
