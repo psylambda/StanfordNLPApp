@@ -17,7 +17,7 @@ public class KeywordsExtraction {
     }
 
 
-    List<String[]> wordToTag;
+
 
     public void extractKeywordsFromString(String propertyFileName, String defaultTag, String text) throws IOException {
         Annotation document = MyUtils.AnalyzeFromString(propertyFileName, text);
@@ -52,10 +52,14 @@ public class KeywordsExtraction {
         }
     }
 
+    List<String[][]> result;
+
+    List<String> taggedSentences;
+
     private void extractKeywords(String propertyFileName, String defaultTag, Annotation document) throws IOException {
         taggedSentences = new LinkedList<>();
         tagToWords = new HashMap<>();
-        wordToTag = new LinkedList<>();
+        result = new ArrayList<>();
         for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
             //we iterate over all sentences here
             //tagToWordsInSentence map a tag to big words in a sentence
@@ -63,7 +67,8 @@ public class KeywordsExtraction {
             StringBuilder sentenceBuilder = new StringBuilder();
             StringBuilder wordBuilder = new StringBuilder();
             String lastTag = defaultTag;
-
+            List<String> wordList = new ArrayList<>();
+            List<String> tagList = new ArrayList<>();
             for (CoreLabel token : sentence.get(CoreAnnotations.TokensAnnotation.class)) {
                 //we iterate over all words and associated tags here
                 String word = token.get(CoreAnnotations.TextAnnotation.class);
@@ -80,12 +85,12 @@ public class KeywordsExtraction {
                         tagToWordsInSentence.get(lastTag).add(wordBuilder.toString());
 
                         //construct wordToTag
-                        String[] wordAndTag = new String[2];
-                        wordAndTag[0] = wordBuilder.toString();
-                        wordAndTag[1] = lastTag;
-                        wordToTag.add(wordAndTag);
-
-
+//                        String[] wordAndTag = new String[2];
+//                        wordAndTag[0] = wordBuilder.toString();
+//                        wordAndTag[1] = lastTag;
+//                        wordToTag.add(wordAndTag);
+                        wordList.add(wordBuilder.toString());
+                        tagList.add(lastTag);
                         wordBuilder.replace(0, wordBuilder.length(), word);
                     } else
                         wordBuilder.append(word);
@@ -99,10 +104,12 @@ public class KeywordsExtraction {
                 tagToWordsInSentence.get(lastTag).add(wordBuilder.toString());
 
                 //construct wordToTag
-                String[] wordAndTag = new String[2];
-                wordAndTag[0] = wordBuilder.toString();
-                wordAndTag[1] = lastTag;
-                wordToTag.add(wordAndTag);
+//                String[] wordAndTag = new String[2];
+//                wordAndTag[0] = wordBuilder.toString();
+//                wordAndTag[1] = lastTag;
+//                wordToTag.add(wordAndTag);
+                wordList.add(wordBuilder.toString());
+                tagList.add(lastTag);
             }
             sentenceBuilder.append("\n");
             //construct the tagged sentences, and keywords files.
@@ -121,16 +128,21 @@ public class KeywordsExtraction {
                 tagToWords.get(tag).addAll(words);
             }
             taggedSentences.add(sentenceBuilder.append("\n").toString());
-        };
+
+            //construct result
+            String[][] resInSentence = new String[2][wordList.size()];
+            resInSentence[0] = wordList.toArray(resInSentence[0]);
+            resInSentence[1] = tagList.toArray(resInSentence[1]);
+            result.add(resInSentence);
+        }
+        ;
 
 
-    }
-
-    List<String> taggedSentences;
-
-    public List<String[]> getWordToTag() {
-        return wordToTag;
     }
     //tagToWords map a tag to big words
     Map<String, Set<String>> tagToWords;
+
+    public List<String[][]> getResult() {
+        return result;
+    }
 }
