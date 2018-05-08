@@ -32,7 +32,7 @@ public class NerServer {
     public void start() throws IOException {
         server = HttpServer.create(new InetSocketAddress(56786), 0);
         server.createContext("/ner", new TagByNER());
-        server.createContext("/stringmatching", new TagByStringMatch());
+        server.createContext("/stringmatch", new TagByStringMatch());
         server.setExecutor(null);
         server.start();
 
@@ -112,7 +112,7 @@ public class NerServer {
                 while (null != (line = reader.readLine())) {
                     builder.append(line).append('\n');
                 }
-                System.out.println("/stringmatching: " + builder.toString());
+                System.out.println("/stringmatch: " + builder.toString());
                 UntaggedText input = gson.fromJson(builder.toString(), UntaggedText.class);
                 TaggedText output = new TaggedText();
                 String[][][] result = tagger.tagByNER(input.text);
