@@ -115,7 +115,7 @@ public class NerServer {
                 System.out.println("/stringmatch: " + builder.toString());
                 UntaggedText input = gson.fromJson(builder.toString(), UntaggedText.class);
                 TaggedText output = new TaggedText();
-                String[][][] result = tagger.tagByNER(input.text);
+                String[][][] result = tagger.tagByStringMatching(input.text);
                 output.sentences = new Sentence[result.length];
                 for (int i = 0; i < result.length; i++) {
                     output.sentences[i] = new Sentence();
