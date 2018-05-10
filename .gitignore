@@ -1,6 +1,6 @@
 /target/
-
-#*.ser.gz
+features-true.txt
+*.ser.gz
 # Compiled class file
 *.class
 
