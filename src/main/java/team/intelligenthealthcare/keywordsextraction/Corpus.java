@@ -32,10 +32,12 @@ public class Corpus {
         StanfordCoreNLP corenlp = new StanfordCoreNLP(segmentationPropertyFileName);
         int i = 0;
         for(String text : unmarkedCorpus) {
-            Annotation document = new Annotation(text);
-            corenlp.annotate(document);
-            parse(d, document, defaultTag);
             i++;
+            Annotation document = new Annotation(text);
+            System.out.println("[ " + i + " / " + unmarkedCorpus.size() + " ] of corpus annotation start. Totally " + text.length() + " bytes. " + new Date());
+            corenlp.annotate(document);
+            System.out.println("[ " + i + " / " + unmarkedCorpus.size() + " ] of corpus parse start. Totally " + text.length() + " bytes. " + new Date());
+            parse(d, document, defaultTag);
             System.out.println("[ " + i + " / " + unmarkedCorpus.size() + " ] of corpus has been analyzed. Totally " + text.length() + " bytes. " + new Date());
         }
     }
@@ -55,10 +57,13 @@ public class Corpus {
             }
             //tag by matching consecutive words with dicts
             StringBuilder sb = new StringBuilder();
-            for (int i = 0; i < words.size(); i++) {
+            OutLabel: for (int i = 0; i < words.size(); i++) {
                 sb.delete(0, sb.length());
-                for (int j = i; j < words.size(); j++) {
+                for (int j = i; j < words.size() && j < i+20; j++) {
                     sb.append(words.get(j));
+                    //if the word has already been tagged, skip it.
+                    if(!tags.get(j).equals(defaultTag))
+                        break;
                     //now sb contains consecutive words "words[i]+words[i+1]...words[j]"
                     //If that big word is in a dict, tag it
                     for (Map.Entry<String, Set<String>> tagAndDict : d.getDict().entrySet()) {
@@ -67,16 +72,19 @@ public class Corpus {
                         if (dict.contains(sb.toString())) {
                             //if the big word has been tagged already, then skip it.
                             //otherwise, tag it.
-                            boolean hasBeenTagged = false;
-                            for (int k = i; k <= j; k++)
-                                if(!tags.get(k).equals(defaultTag)) {
-                                    hasBeenTagged = true;
-                                    break;
-                                }
-                            if(!hasBeenTagged) {
+//                            boolean hasBeenTagged = false;
+//                            for (int k = i; k <= j; k++)
+//                                if(!tags.get(k).equals(defaultTag)) {
+//                                    hasBeenTagged = true;
+//                                    break;
+//                                }
+//                            if(!hasBeenTagged) {
                                 for (int k = i; k <= j; k++)
                                     tags.set(k, tag);
-                            }
+                                //Since we have already tagged the big word, skip.
+                                i=j-1;
+                                continue OutLabel;
+                            //}
                         }
                     }
                 }
