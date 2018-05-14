@@ -35,7 +35,7 @@ public class NerServer {
         server.createContext("/stringmatch", new TagByStringMatch());
         server.setExecutor(null);
         server.start();
-
+        //下个版本加上下面这句话，预先加载模型到内存中，防止第一次调用慢
         //String[][][] tmp = tagger.tagByNER("芝麻开门。");
         //System.out.println(tmp);
     }
