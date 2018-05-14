@@ -55,7 +55,7 @@ public class NerServer {
 
     private class Sentence {
         public String[] words;
-        public String[] tags;
+        public int[] tags;
     }
 
     private class TaggedText {
@@ -85,8 +85,13 @@ public class NerServer {
                 output.sentences = new Sentence[result.length];
                 for (int i = 0; i < result.length; i++) {
                     output.sentences[i] = new Sentence();
-                    output.sentences[i].tags = result[i][0];
-                    output.sentences[i].words = result[i][1];
+                    output.sentences[i].words = result[i][0];
+                    output.sentences[i].tags = new int[result[i][1].length];
+                    for (int j = 0; j < output.sentences[i].tags.length; j++)
+                        if (result[i][1][j].equals("MED"))
+                            output.sentences[i].tags[j] = 1;
+                        else
+                            output.sentences[i].tags[j] = 0;
                 }
                 msg = gson.toJson(output);
                 t.sendResponseHeaders(200, msg.getBytes().length);
@@ -119,8 +124,13 @@ public class NerServer {
                 output.sentences = new Sentence[result.length];
                 for (int i = 0; i < result.length; i++) {
                     output.sentences[i] = new Sentence();
-                    output.sentences[i].tags = result[i][0];
-                    output.sentences[i].words = result[i][1];
+                    output.sentences[i].words = result[i][0];
+                    output.sentences[i].tags = new int[result[i][1].length];
+                    for (int j = 0; j < output.sentences[i].tags.length; j++)
+                        if (result[i][1][j].equals("MED"))
+                            output.sentences[i].tags[j] = 1;
+                        else
+                            output.sentences[i].tags[j] = 0;
                 }
                 msg = gson.toJson(output);
                 t.sendResponseHeaders(200, msg.getBytes().length);
