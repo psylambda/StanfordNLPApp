@@ -16,7 +16,7 @@ public class NerServer {
     private Tagger tagger;
     private Gson gson;
 
-    public NerServer() {
+    public NerServer() throws IOException {
         tagger = new Tagger();
         gson = new Gson();
     }
@@ -33,7 +33,6 @@ public class NerServer {
         server.createContext("/stringmatch", new TagByStringMatch());
         server.setExecutor(null);
         server.start();
-        //下个版本加上下面这句话，预先加载模型到内存中，防止第一次调用慢
         tagger.tagByNER("预先加载模型到内存中，防止第一次调用慢");
         tagger.tagByStringMatching("预先加载模型到内存中，防止第一次调用慢");
         //System.out.println(tmp);

@@ -3,6 +3,7 @@ package team.intelligenthealthcare.keywordsextraction;
 import edu.stanford.nlp.ling.CoreAnnotations;
 import edu.stanford.nlp.ling.CoreLabel;
 import edu.stanford.nlp.pipeline.Annotation;
+import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
 
 import java.io.FileOutputStream;
@@ -10,57 +11,28 @@ import java.io.IOException;
 import java.util.*;
 
 public class KeywordsExtraction {
-    public KeywordsExtraction()
+    private final StanfordCoreNLP corenlp;
+    private final String defaultTag;
+    public KeywordsExtraction(String propertyFileName, String defaultTag)
     {
-        taggedSentences = new LinkedList<>();
-        tagToWords = new HashMap<>();
+        this.corenlp = new StanfordCoreNLP(propertyFileName);
+        this.defaultTag = defaultTag;
+//        taggedSentences = new LinkedList<>();
+//        tagToWords = new HashMap<>();
     }
 
 
 
 
-    public void extractKeywordsFromString(String propertyFileName, String defaultTag, String text) throws IOException {
-        Annotation document = MyUtils.AnalyzeFromString(propertyFileName, text);
-        extractKeywords(propertyFileName, defaultTag, document);
-    }
+    public List<List<List<String>>> tagString(String text) throws IOException {
+        Annotation document = new Annotation(text);
+        if(text.isEmpty()) return new ArrayList<>();
+        corenlp.annotate(document);
 
-    public void extractKeywordsFromFile(String propertyFileName, String defaultTag, String inputFilename) throws IOException {
-        Annotation document = MyUtils.AnalyzeFromFile(propertyFileName, inputFilename);
-        extractKeywords(propertyFileName, defaultTag, document);
-    }
-
-    public void writeResults(String targetFileName, String keywordsFileName) {
-        try (FileOutputStream targetFile = new FileOutputStream(MyUtils.getAbsolutePath(targetFileName))) {
-            for (String line : taggedSentences)
-                targetFile.write(line.getBytes());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-
-        //write words with the same tag to a file
-        for (Map.Entry<String, Set<String>> entry : tagToWords.entrySet()) {
-            String tag = entry.getKey();
-            Set<String> words = entry.getValue();
-            StringBuilder sb = new StringBuilder();
-            words.forEach(s -> sb.append(s).append("\r\n"));
-            String curKeywordsFileName = keywordsFileName.replace("*", tag);
-            try (FileOutputStream curOut = new FileOutputStream(MyUtils.getAbsolutePath(curKeywordsFileName))) {
-                curOut.write(sb.toString().getBytes());
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-    }
-
-    List<String[][]> result;
-
-    List<String> taggedSentences;
-
-    private void extractKeywords(String propertyFileName, String defaultTag, Annotation document) throws IOException {
-        taggedSentences = new LinkedList<>();
-        tagToWords = new HashMap<>();
-        result = new ArrayList<>();
-        if(document.get(CoreAnnotations.SentencesAnnotation.class) == null) return;
+        List<String> taggedSentences = new LinkedList<>();
+        Map<String, Set<String>> tagToWords = new HashMap<>();
+        List<List<List<String>>> result = new ArrayList<>();
+        if(document.get(CoreAnnotations.SentencesAnnotation.class) == null) return new ArrayList<>();
         for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
             //we iterate over all sentences here
             //tagToWordsInSentence map a tag to big words in a sentence
@@ -84,12 +56,6 @@ public class KeywordsExtraction {
                             tagToWordsInSentence.put(lastTag, new LinkedList<>());
 
                         tagToWordsInSentence.get(lastTag).add(wordBuilder.toString());
-
-                        //construct wordToTag
-//                        String[] wordAndTag = new String[2];
-//                        wordAndTag[0] = wordBuilder.toString();
-//                        wordAndTag[1] = lastTag;
-//                        wordToTag.add(wordAndTag);
                         wordList.add(wordBuilder.toString());
                         tagList.add(lastTag);
                         wordBuilder.replace(0, wordBuilder.length(), word);
@@ -105,10 +71,6 @@ public class KeywordsExtraction {
                 tagToWordsInSentence.get(lastTag).add(wordBuilder.toString());
 
                 //construct wordToTag
-//                String[] wordAndTag = new String[2];
-//                wordAndTag[0] = wordBuilder.toString();
-//                wordAndTag[1] = lastTag;
-//                wordToTag.add(wordAndTag);
                 wordList.add(wordBuilder.toString());
                 tagList.add(lastTag);
             }
@@ -131,19 +93,54 @@ public class KeywordsExtraction {
             taggedSentences.add(sentenceBuilder.append("\n").toString());
 
             //construct result
-            String[][] resInSentence = new String[2][wordList.size()];
-            resInSentence[0] = wordList.toArray(resInSentence[0]);
-            resInSentence[1] = tagList.toArray(resInSentence[1]);
-            result.add(resInSentence);
+            result.add(new ArrayList<>());
+            result.get(result.size()-1).add(wordList);
+            result.get(result.size()-1).add(tagList);
         }
-        ;
-
-
-    }
-    //tagToWords map a tag to big words
-    Map<String, Set<String>> tagToWords;
-
-    public List<String[][]> getResult() {
         return result;
     }
+
+    public  List<List<List<String>>> tagFile(String inputFilename) throws IOException {
+        return tagString(MyUtils.readFileAsString(inputFilename));
+    }
+
+//    public void writeResults(String targetFileName, String keywordsFileName) {
+//        try (FileOutputStream targetFile = new FileOutputStream(MyUtils.getAbsolutePath(targetFileName))) {
+//            for (String line : taggedSentences)
+//                targetFile.write(line.getBytes());
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//
+//        //write words with the same tag to a file
+//        for (Map.Entry<String, Set<String>> entry : tagToWords.entrySet()) {
+//            String tag = entry.getKey();
+//            Set<String> words = entry.getValue();
+//            StringBuilder sb = new StringBuilder();
+//            words.forEach(s -> sb.append(s).append("\r\n"));
+//            String curKeywordsFileName = keywordsFileName.replace("*", tag);
+//            try (FileOutputStream curOut = new FileOutputStream(MyUtils.getAbsolutePath(curKeywordsFileName))) {
+//                curOut.write(sb.toString().getBytes());
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//            }
+//        }
+//    }
+
+    //List<String[][]> result;
+
+    //List<String> taggedSentences;
+
+//    private void extractKeywords( Annotation document) throws IOException {
+//
+//        ;
+//
+//
+//    }
+    //tagToWords map a tag to big words
+    //Map<String, Set<String>> tagToWords;
+
+    //public List<String[][]> getResult() {
+        //return result;
+    //}
 }
