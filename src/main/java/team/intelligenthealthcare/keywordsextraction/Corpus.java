@@ -40,6 +40,7 @@ public class Corpus {
 
         @Override
         public void run() {
+            if(text.isEmpty()) return;
             long startTime = System.currentTimeMillis();
             Annotation document = new Annotation(text);
             corenlp.annotate(document);

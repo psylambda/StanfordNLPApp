@@ -4,14 +4,12 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.sun.net.httpserver.HttpServer;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.InetSocketAddress;
-import java.util.Scanner;
 
 import com.google.gson.Gson;
+
+import java.io.*;
+import java.net.InetSocketAddress;
+import java.util.Scanner;
 
 public class NerServer {
     private HttpServer server;
@@ -36,7 +34,8 @@ public class NerServer {
         server.setExecutor(null);
         server.start();
         //下个版本加上下面这句话，预先加载模型到内存中，防止第一次调用慢
-        //String[][][] tmp = tagger.tagByNER("芝麻开门。");
+        tagger.tagByNER("预先加载模型到内存中，防止第一次调用慢");
+        tagger.tagByStringMatching("预先加载模型到内存中，防止第一次调用慢");
         //System.out.println(tmp);
     }
 

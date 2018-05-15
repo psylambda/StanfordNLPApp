@@ -71,6 +71,7 @@ public class MyUtils {
     public static Annotation AnalyzeFromString(String propertyFileName, String text)
     {
         Annotation document = new Annotation(text);
+        if(text.isEmpty()) return document;
         StanfordCoreNLP corenlp = new StanfordCoreNLP(propertyFileName);
         corenlp.annotate(document);
         return document;

@@ -12,8 +12,8 @@ import java.util.*;
 public class KeywordsExtraction {
     public KeywordsExtraction()
     {
-        taggedSentences = null;
-        tagToWords = null;
+        taggedSentences = new LinkedList<>();
+        tagToWords = new HashMap<>();
     }
 
 
@@ -60,6 +60,7 @@ public class KeywordsExtraction {
         taggedSentences = new LinkedList<>();
         tagToWords = new HashMap<>();
         result = new ArrayList<>();
+        if(document.get(CoreAnnotations.SentencesAnnotation.class) == null) return;
         for (CoreMap sentence : document.get(CoreAnnotations.SentencesAnnotation.class)) {
             //we iterate over all sentences here
             //tagToWordsInSentence map a tag to big words in a sentence
