@@ -108,45 +108,47 @@ public class Tagger {
         Properties property = new Properties();
         InputStream is = Thread.currentThread().getContextClassLoader().getSystemResourceAsStream("keywordsExtraction.properties");
         property.load(is);
+        String s = "慢性支气管炎";
+        tagger.tagByStringMatching(s);
+        long startTime = System.currentTimeMillis();
 
-        String s = "慢性支气管炎(chronic bronchitis)是指气管、支气管黏膜及其周围组织的慢\n" +
-                "性非特异性炎症。临床上以反复发作的咳嗽、咳痰或伴有喘鸣音为特征。上述临床症状每年持续3个月，连续发生2年以上，即可诊断为慢性支气管炎。";
-        //String s = MyUtils.readFileAsString(property.getProperty("keywordsExtraction.inputFileName"));
-        String[][][] a = tagger.tagByStringMatching(s);
-        for(String[][] i : a)
-        {
-            for(String[] j: i)
-            {
-                for(String k: j)
-                    System.out.print(k+"\t");
-                System.out.print("\n");
-            }
-            System.out.print("\n");
+        for (int i = 0; i < 1000; i++) {
+            //String s = MyUtils.readFileAsString(property.getProperty("keywordsExtraction.inputFileName"));
+            tagger.tagByStringMatching(s);
+//            for (String[][] i : a) {
+//                for (String[] j : i) {
+//                    for (String k : j)
+//                        System.out.print(k + "\t");
+//                    System.out.print("\n");
+//                }
+//                System.out.print("\n");
+//            }
+//            System.out.println("");
+//            System.out.println("");
+//            System.out.println("");
+//            System.out.println("");
+//            System.out.println("");
+//            System.out.println("");
+//            System.out.println("");
+//            System.out.println("");
+//            System.out.println("");
+
         }
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
-        System.out.println("");
-
-
-        String[][][] b = tagger.tagByNER(s);
-
-//        for(int i = 0; i < 100; i++)
-//            b = tagByNER(s);
-
-        for (String[][] i : b) {
-            for (String[] j : i) {
-                for (String k : j)
-                    System.out.print(k + "\t");
-                System.out.print("\n");
-            }
-            System.out.print("\n");
-        }
+        long endTime = System.currentTimeMillis();
+        System.out.println("1000 iteration" + Float.toString((endTime - startTime) / 1000F) + " seconds.");
+//        String[][][] b = tagger.tagByNER(s);
+//
+////        for(int i = 0; i < 100; i++)
+////            b = tagByNER(s);
+//
+//        for (String[][] i : b) {
+//            for (String[] j : i) {
+//                for (String k : j)
+//                    System.out.print(k + "\t");
+//                System.out.print("\n");
+//            }
+//            System.out.print("\n");
+//        }
     }
 
     public static void testMaxMemorySize() {
